@@ -1,6 +1,4 @@
-# Neovim C++ & Robotics Configuration
-
-A comprehensive Neovim setup optimized for C++ development and ROS2 robotics workflows.
+# Neovim Configuration
 
 ##  Installation
 
