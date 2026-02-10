@@ -15,6 +15,22 @@ sudo apt update && sudo apt install -y \
     python3-pip
 ```
 
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt update
+sudo apt install neovim git curl build-essential clangd gdb python3-pip -y
+
+
+sudo apt purge nodejs npm -y
+
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+sudo apt install -y nodejs
+
+node -v
+
+sudo apt-install xclip// for copy
+
+
 ### Setup
 
 ```bash
@@ -43,6 +59,10 @@ ln -s build/compile_commands.json .
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ln -s build/YOUR_PACKAGE_NAME/compile_commands.json .
 ```
+
+## FOR AI Cursor and CheckBox
+
+:Copilot auth
 
 ##  Keybindings Reference
 
