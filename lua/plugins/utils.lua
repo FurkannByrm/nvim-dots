@@ -65,7 +65,11 @@ return {
     end
   },
 
-  -- 7. DİĞER TEMEL ARAÇLAR
+  
+    --7.
+  { 'mg979/vim-visual-multi', branch = 'master' },
+
+  -- 8. DİĞER TEMEL ARAÇLAR
   { "numToStr/Comment.nvim", config = function() require('Comment').setup() end },
   { "akinsho/toggleterm.nvim", version = "*", config = function() require("toggleterm").setup({ direction = 'float' }) end },
   { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup({}) end }
