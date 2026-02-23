@@ -86,10 +86,6 @@ ln -s build/YOUR_PACKAGE_NAME/compile_commands.json .
 |-------------|--------|
 | `:vsplit` | Split window vertically |
 | `:split` | Split window horizontally |
-| `Ctrl + h` | Navigate to left window |
-| `Ctrl + l` | Navigate to right window |
-| `Ctrl + j` | Navigate to window below |
-| `Ctrl + k` | Navigate to window above |
 
 ### Code Editing
 
@@ -117,6 +113,10 @@ ln -s build/YOUR_PACKAGE_NAME/compile_commands.json .
 | `<leader>xx` (Space + xx) | Open Trouble: project-wide diagnostics |
 | `gd` | Go to Definition |
 | `K` | Show documentation (hover info) |
+
+| `ctrl n` |multi selection same word in file, and you can reconfigure with 'c'|
+| `alt + j` | the line move to down  |
+| `alt + k` | the line move to up |
 
 ### Debugging (DAP)
 
