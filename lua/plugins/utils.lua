@@ -32,8 +32,25 @@ return {
   { 
     "vim-scripts/a.vim", 
     event = "VeryLazy",
+    init = function()
+      -- src/ ve include/ ayrı klasörlerde olan projeleri destekle
+      vim.g.alternateSearchPath = table.concat({
+        "sfr:../include",        -- src/ -> include/
+        "sfr:../src",            -- include/ -> src/
+        "sfr:../include/**",     -- src/ -> include/alt_klasörler/
+        "sfr:../src/**",         -- include/alt/ -> src/alt/
+        "reg:|src[/\\\\]|include/|",   -- src/x.cpp -> include/x.hpp
+        "reg:|include[/\\\\]|src/|",   -- include/x.hpp -> src/x.cpp
+        "sfr:.",                 -- aynı klasör (fallback)
+      }, ",")
+      -- .hpp <-> .cpp eşleşmesini ekle
+      vim.g.alternateExtensions_hpp = "cpp,cc,cxx"
+      vim.g.alternateExtensions_cpp = "hpp,h,hxx"
+      vim.g.alternateExtensions_h = "cpp,cc,c,cxx"
+      vim.g.alternateExtensions_cc = "hpp,h,hxx"
+    end,
     config = function()
-      vim.keymap.set('n', 'ga', ':A<CR>', { desc = "Header/Source Geçişi" })
+      vim.keymap.set('n', 'ga', ':A<CR>', { desc = "Header/Source Toggle" })
     end
   },
 
