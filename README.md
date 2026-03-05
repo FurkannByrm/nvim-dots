@@ -128,6 +128,45 @@ Let's say `Point.cpp` is open and you want `Point.hpp` next to it:
 | `u` | Undo |
 | `Ctrl + r` | Redo |
 
+### Navigation & Scrolling
+
+#### Page Scrolling
+
+| Key | Action |
+|-----|--------|
+| `Ctrl + d` | Scroll half page down |
+| `Ctrl + u` | Scroll half page up |
+| `Ctrl + f` | Scroll full page down (forward) |
+| `Ctrl + b` | Scroll full page up (back) |
+| `Ctrl + e` | Scroll screen down without moving cursor |
+| `Ctrl + y` | Scroll screen up without moving cursor |
+
+#### Cursor Positioning on Screen
+
+| Key | Action |
+|-----|--------|
+| `zz` | Center current line on screen |
+| `zt` | Move current line to top of screen |
+| `zb` | Move current line to bottom of screen |
+
+> **Tip:** Press `zz` when you find a function to center it and see the surrounding code.
+
+#### Jump to Screen Edges
+
+| Key | Action |
+|-----|--------|
+| `H` | Jump to the top (High) of the visible screen |
+| `M` | Jump to the middle of the visible screen |
+| `L` | Jump to the bottom (Low) of the visible screen |
+
+#### Jump to File Positions
+
+| Key | Action |
+|-----|--------|
+| `gg` | Jump to the first line of the file |
+| `G` | Jump to the last line of the file |
+| `150G` | Jump directly to line 150 |
+
 ### Commenting (Comment.nvim)
 
 | Key | Action |
