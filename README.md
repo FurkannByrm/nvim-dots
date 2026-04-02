@@ -1,68 +1,208 @@
 # Neovim Configuration
 
-##  Installation
+Temiz bir Ubuntu (20.04 / 22.04 / 24.04) üzerine bu Neovim konfigürasyonunu kurmak için aşağıdaki adımları sırasıyla takip edin.
 
-### Prerequisites
+---
+
+## Adım 1 — Sistemi Güncelle
 
 ```bash
-sudo apt update && sudo apt install -y \
-    neovim \
-    git \
-    curl \
-    build-essential \
-    gdb \
-    clangd \
-    python3-pip
+sudo apt update && sudo apt upgrade -y
 ```
 
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
-sudo apt update
-sudo apt install neovim git curl build-essential clangd gdb python3-pip -y
-
-
-sudo apt purge nodejs npm -y
-
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-
-sudo apt install -y nodejs
-
-node -v
-
-sudo apt-install xclip// for copy
-
-
-### Setup
+## Adım 2 — Temel Bağımlılıkları Kur
 
 ```bash
-# Backup existing config if it exists
+sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
+```
+
+| Paket | Neden Gerekli |
+|-------|---------------|
+| `git` | Plugin yöneticisi (Lazy.nvim) tüm eklentileri git ile çeker |
+| `curl`, `wget` | İndirme işlemleri (Node.js, font vb.) |
+| `unzip` | Mason LSP yöneticisinin paketleri açması için |
+| `build-essential` | `make`, `gcc`, `g++` — avante.nvim derleme adımı ve C++ geliştirme |
+| `cmake` | CMake projelerinde `compile_commands.json` üretmek için |
+| `gdb` | DAP (Debug Adapter Protocol) ile C++ hata ayıklama |
+| `python3-pip` | Python araçları |
+| `ripgrep` | Hızlı dosya içi arama |
+| `xclip` | Neovim → sistem panoya kopyalama (`"+y`) |
+| `software-properties-common` | PPA eklemek için gerekli |
+
+## Adım 3 — Neovim Kur (≥ 0.10)
+
+Ubuntu varsayılan depolarındaki Neovim çok eski. Güncel sürümü PPA'dan kuruyoruz:
+
+```bash
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt update
+sudo apt install -y neovim
+```
+
+Kurulumu doğrula:
+
+```bash
+nvim --version
+# v0.10+ çıkmalı
+```
+
+## Adım 4 — Node.js Kur (≥ 20)
+
+Copilot ve bazı LSP sunucuları Node.js gerektirir.
+
+```bash
+# Varsa eski Node/npm'i kaldır
+sudo apt purge -y nodejs npm 2>/dev/null
+sudo rm -rf /usr/lib/node_modules /usr/local/lib/node_modules
+
+# Node.js 20.x LTS kur
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+Kurulumu doğrula:
+
+```bash
+node -v   # v20.x+
+npm -v    # 10.x+
+```
+
+## Adım 5 — Clangd Kur (C++ LSP)
+
+```bash
+sudo apt install -y clangd
+```
+
+> **Not:** Ubuntu 20.04'te `clangd` yerine `clangd-12` veya daha yüksek sürüm kurmanız gerekebilir:
+> ```bash
+> sudo apt install -y clangd-14
+> sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-14 100
+> ```
+
+## Adım 6 — Nerd Font Kur (İkonlar için)
+
+Eklentiler (nvim-web-devicons, Neo-tree) ikon gösterebilmek için bir **Nerd Font** kullanır. Terminal fontunu değiştirmezsek ikonlar bozuk görünür.
+
+```bash
+mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts
+
+# JetBrainsMono Nerd Font indir
+curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+tar -xf JetBrainsMono.tar.xz
+rm -f JetBrainsMono.tar.xz
+
+# Font önbelleğini güncelle
+fc-cache -fv
+```
+
+Ardından **terminal uygulamanın ayarlarından** fontu **JetBrainsMono Nerd Font** olarak değiştir.
+
+## Adım 7 — Konfigürasyonu Kopyala
+
+```bash
+# Varsa eski config'i yedekle
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
 
-# Clone this repository
+# Bu repoyu klonla
 git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
+```
 
-# Launch Neovim
+## Adım 8 — İlk Çalıştırma (Eklenti Kurulumu)
+
+```bash
 nvim
 ```
 
-## LSP Configuration
+İlk açılışta **Lazy.nvim** otomatik olarak tüm eklentileri indirir ve kurar. Bu işlem birkaç dakika sürebilir.
 
-### CMake Projects
+- Treesitter parser'ları otomatik indirilir (`cpp`, `c`, `lua`, `cmake`, `bash`, `markdown`).
+- Mason otomatik olarak `clangd` LSP'yi kontrol eder.
+- **avante.nvim** için `make` komutu çalışır (derleme aşaması).
+
+> Kurulum tamamlanınca Neovim'i kapatıp tekrar açın.
+
+## Adım 9 — GitHub Copilot Kimlik Doğrulama
+
+Copilot (AI özellikleri) kullanmak için GitHub Copilot aboneliğiniz olmalı.
+
+```
+:Copilot auth
+```
+
+Açılan tarayıcı penceresinden GitHub hesabınızla giriş yapın ve onaylayın.
+
+## Adım 10 — Sağlık Kontrolü
+
+Neovim içinde her şeyin doğru kurulduğunu doğrulayın:
+
+```
+:checkhealth
+```
+
+Kritik kontrol noktaları:
+
+- **clipboard** → `xclip` bulunmalı
+- **Node.js** → `node` bulunmalı
+- **Treesitter** → parserlar yüklenmiş olmalı
+- **LSP (clangd)** → çalışır durumda olmalı
+
+---
+
+## Hızlı Kurulum (Tek Komut — Kopyala-Yapıştır)
+
+Tüm adımları tek seferde çalıştırmak istersen:
+
+```bash
+# 1) Sistem güncelle + temel paketler
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
+
+# 2) Neovim (unstable PPA)
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt update && sudo apt install -y neovim
+
+# 3) Node.js 20.x
+sudo apt purge -y nodejs npm 2>/dev/null
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 4) Clangd
+sudo apt install -y clangd
+
+# 5) Nerd Font
+mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+tar -xf JetBrainsMono.tar.xz && rm -f JetBrainsMono.tar.xz
+fc-cache -fv
+
+# 6) Config'i klonla
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
+
+# 7) Neovim'i başlat (eklentiler otomatik kurulur)
+nvim
+```
+
+> **Önemli:** İlk `nvim` açılışından sonra Neovim'i kapatıp tekrar açın, ardından `:Copilot auth` ile giriş yapın.
+
+---
+
+## LSP Konfigürasyonu (Proje Bazlı)
+
+### CMake Projeleri
 
 ```bash
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
 ln -s build/compile_commands.json .
 ```
 
-### ROS2 Projects
+### ROS2 Projeleri
 
 ```bash
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ln -s build/YOUR_PACKAGE_NAME/compile_commands.json .
 ```
-
-## FOR AI Cursor and CheckBox
-
-:Copilot auth
 
 ##  Keybindings Reference
 
