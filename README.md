@@ -1,37 +1,37 @@
 # Neovim Configuration
 
-Temiz bir Ubuntu (20.04 / 22.04 / 24.04) üzerine bu Neovim konfigürasyonunu kurmak için aşağıdaki adımları sırasıyla takip edin.
+Follow these steps in order to set up this Neovim configuration on a fresh Ubuntu (20.04 / 22.04 / 24.04) installation.
 
 ---
 
-## Adım 1 — Sistemi Güncelle
+## Step 1 — Update the System
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-## Adım 2 — Temel Bağımlılıkları Kur
+## Step 2 — Install Core Dependencies
 
 ```bash
 sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
 ```
 
-| Paket | Neden Gerekli |
-|-------|---------------|
-| `git` | Plugin yöneticisi (Lazy.nvim) tüm eklentileri git ile çeker |
-| `curl`, `wget` | İndirme işlemleri (Node.js, font vb.) |
-| `unzip` | Mason LSP yöneticisinin paketleri açması için |
-| `build-essential` | `make`, `gcc`, `g++` — avante.nvim derleme adımı ve C++ geliştirme |
-| `cmake` | CMake projelerinde `compile_commands.json` üretmek için |
-| `gdb` | DAP (Debug Adapter Protocol) ile C++ hata ayıklama |
-| `python3-pip` | Python araçları |
-| `ripgrep` | Hızlı dosya içi arama |
-| `xclip` | Neovim → sistem panoya kopyalama (`"+y`) |
-| `software-properties-common` | PPA eklemek için gerekli |
+| Package | Why It's Needed |
+|---------|----------------|
+| `git` | Plugin manager (Lazy.nvim) clones all plugins via git |
+| `curl`, `wget` | Download operations (Node.js, fonts, etc.) |
+| `unzip` | Required by Mason LSP manager to extract packages |
+| `build-essential` | `make`, `gcc`, `g++` — avante.nvim build step and C++ development |
+| `cmake` | Generate `compile_commands.json` for CMake projects |
+| `gdb` | C++ debugging via DAP (Debug Adapter Protocol) |
+| `python3-pip` | Python tooling |
+| `ripgrep` | Fast in-file search |
+| `xclip` | Neovim → system clipboard copy (`"+y`) |
+| `software-properties-common` | Required to add PPAs |
 
-## Adım 3 — Neovim Kur (≥ 0.10)
+## Step 3 — Install Neovim (≥ 0.10)
 
-Ubuntu varsayılan depolarındaki Neovim çok eski. Güncel sürümü PPA'dan kuruyoruz:
+The default Ubuntu repositories ship a very old Neovim version. Install the latest from the PPA:
 
 ```bash
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
@@ -39,122 +39,122 @@ sudo apt update
 sudo apt install -y neovim
 ```
 
-Kurulumu doğrula:
+Verify the installation:
 
 ```bash
 nvim --version
-# v0.10+ çıkmalı
+# Should show v0.10+
 ```
 
-## Adım 4 — Node.js Kur (≥ 20)
+## Step 4 — Install Node.js (≥ 20)
 
-Copilot ve bazı LSP sunucuları Node.js gerektirir.
+Copilot and some LSP servers require Node.js.
 
 ```bash
-# Varsa eski Node/npm'i kaldır
+# Remove old Node/npm if present
 sudo apt purge -y nodejs npm 2>/dev/null
 sudo rm -rf /usr/lib/node_modules /usr/local/lib/node_modules
 
-# Node.js 20.x LTS kur
+# Install Node.js 20.x LTS
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 ```
 
-Kurulumu doğrula:
+Verify the installation:
 
 ```bash
 node -v   # v20.x+
 npm -v    # 10.x+
 ```
 
-## Adım 5 — Clangd Kur (C++ LSP)
+## Step 5 — Install Clangd (C++ LSP)
 
 ```bash
 sudo apt install -y clangd
 ```
 
-> **Not:** Ubuntu 20.04'te `clangd` yerine `clangd-12` veya daha yüksek sürüm kurmanız gerekebilir:
+> **Note:** On Ubuntu 20.04 you may need to install a newer version explicitly:
 > ```bash
 > sudo apt install -y clangd-14
 > sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-14 100
 > ```
 
-## Adım 6 — Nerd Font Kur (İkonlar için)
+## Step 6 — Install a Nerd Font (for icons)
 
-Eklentiler (nvim-web-devicons, Neo-tree) ikon gösterebilmek için bir **Nerd Font** kullanır. Terminal fontunu değiştirmezsek ikonlar bozuk görünür.
+Plugins (nvim-web-devicons, Neo-tree) use a **Nerd Font** to render icons. Without one, icons will appear as broken characters.
 
 ```bash
 mkdir -p ~/.local/share/fonts
 cd ~/.local/share/fonts
 
-# JetBrainsMono Nerd Font indir
+# Download JetBrainsMono Nerd Font
 curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
 tar -xf JetBrainsMono.tar.xz
 rm -f JetBrainsMono.tar.xz
 
-# Font önbelleğini güncelle
+# Rebuild font cache
 fc-cache -fv
 ```
 
-Ardından **terminal uygulamanın ayarlarından** fontu **JetBrainsMono Nerd Font** olarak değiştir.
+Then change the font in your **terminal application settings** to **JetBrainsMono Nerd Font**.
 
-## Adım 7 — Konfigürasyonu Kopyala
+## Step 7 — Clone the Configuration
 
 ```bash
-# Varsa eski config'i yedekle
+# Back up existing config if present
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
 
-# Bu repoyu klonla
+# Clone this repository
 git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
 ```
 
-## Adım 8 — İlk Çalıştırma (Eklenti Kurulumu)
+## Step 8 — First Launch (Plugin Installation)
 
 ```bash
 nvim
 ```
 
-İlk açılışta **Lazy.nvim** otomatik olarak tüm eklentileri indirir ve kurar. Bu işlem birkaç dakika sürebilir.
+On the first launch **Lazy.nvim** will automatically download and install all plugins. This may take a few minutes.
 
-- Treesitter parser'ları otomatik indirilir (`cpp`, `c`, `lua`, `cmake`, `bash`, `markdown`).
-- Mason otomatik olarak `clangd` LSP'yi kontrol eder.
-- **avante.nvim** için `make` komutu çalışır (derleme aşaması).
+- Treesitter parsers are installed automatically (`cpp`, `c`, `lua`, `cmake`, `bash`, `markdown`).
+- Mason checks and installs the `clangd` LSP server.
+- **avante.nvim** runs its `make` build step.
 
-> Kurulum tamamlanınca Neovim'i kapatıp tekrar açın.
+> Close and reopen Neovim after the installation finishes.
 
-## Adım 9 — GitHub Copilot Kimlik Doğrulama
+## Step 9 — GitHub Copilot Authentication
 
-Copilot (AI özellikleri) kullanmak için GitHub Copilot aboneliğiniz olmalı.
+You need a GitHub Copilot subscription to use the AI features.
 
 ```
 :Copilot auth
 ```
 
-Açılan tarayıcı penceresinden GitHub hesabınızla giriş yapın ve onaylayın.
+Sign in with your GitHub account in the browser window that opens and authorize.
 
-## Adım 10 — Sağlık Kontrolü
+## Step 10 — Health Check
 
-Neovim içinde her şeyin doğru kurulduğunu doğrulayın:
+Verify everything is installed correctly inside Neovim:
 
 ```
 :checkhealth
 ```
 
-Kritik kontrol noktaları:
+Key checkpoints:
 
-- **clipboard** → `xclip` bulunmalı
-- **Node.js** → `node` bulunmalı
-- **Treesitter** → parserlar yüklenmiş olmalı
-- **LSP (clangd)** → çalışır durumda olmalı
+- **clipboard** → `xclip` should be found
+- **Node.js** → `node` should be found
+- **Treesitter** → parsers should be installed
+- **LSP (clangd)** → should be running
 
 ---
 
-## Hızlı Kurulum (Tek Komut — Kopyala-Yapıştır)
+## Quick Install (Single Copy-Paste Block)
 
-Tüm adımları tek seferde çalıştırmak istersen:
+Run all the steps at once:
 
 ```bash
-# 1) Sistem güncelle + temel paketler
+# 1) Update system + install core packages
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
 
@@ -176,28 +176,28 @@ curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBr
 tar -xf JetBrainsMono.tar.xz && rm -f JetBrainsMono.tar.xz
 fc-cache -fv
 
-# 6) Config'i klonla
+# 6) Clone config
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
 git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
 
-# 7) Neovim'i başlat (eklentiler otomatik kurulur)
+# 7) Launch Neovim (plugins install automatically)
 nvim
 ```
 
-> **Önemli:** İlk `nvim` açılışından sonra Neovim'i kapatıp tekrar açın, ardından `:Copilot auth` ile giriş yapın.
+> **Important:** After the first `nvim` launch, close and reopen Neovim, then run `:Copilot auth` to sign in.
 
 ---
 
-## LSP Konfigürasyonu (Proje Bazlı)
+## LSP Configuration (Per-Project)
 
-### CMake Projeleri
+### CMake Projects
 
 ```bash
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
 ln -s build/compile_commands.json .
 ```
 
-### ROS2 Projeleri
+### ROS2 Projects
 
 ```bash
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
