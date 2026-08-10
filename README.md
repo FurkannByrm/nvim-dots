@@ -1,37 +1,119 @@
-# Neovim Configuration
+# Neovim Configuration for C++ & ROS 2 Development
 
-Follow these steps in order to set up this Neovim configuration on a fresh Ubuntu (20.04 / 22.04 / 24.04) installation.
+A modern, fast, and practical Neovim setup focused on:
+
+- **C++20/23**
+- **ROS 2**
+- **Python**
+- **Lua**
+
+Built around `lazy.nvim`, `nvim-cmp`, `mason.nvim`, `nvim-treesitter`, and `nvim-dap`.
 
 ---
 
-## Step 1 — Update the System
+## Table of Contents
+
+- [Features](#features)
+- [Quick Install (Single Copy-Paste Block)](#quick-install-single-copy-paste-block)
+- [Step-by-Step Installation](#step-by-step-installation)
+- [First Launch](#first-launch)
+- [Project Setup for C++ and ROS 2](#project-setup-for-c-and-ros-2)
+- [Keybindings](#keybindings)
+- [Health Check](#health-check)
+- [Troubleshooting](#troubleshooting)
+- [Repository](#repository)
+
+---
+
+## Features
+
+- Fast plugin management with `lazy.nvim`
+- LSP support and completion via `nvim-cmp`
+- Syntax highlighting and parsing via `nvim-treesitter`
+- Tool/LSP installer via `mason.nvim`
+- Debug workflow with `nvim-dap`
+- File navigation with Neo-tree
+- C++/ROS 2 workflow with `clangd`
+
+---
+
+## Quick Install (Single Copy-Paste Block)
+
+> Recommended for Ubuntu 20.04 / 22.04 / 24.04.
+
+```bash
+# 1) System update + core packages
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y \
+  git curl wget unzip build-essential cmake gdb \
+  python3-pip python3-venv \
+  ripgrep xclip wl-clipboard \
+  software-properties-common \
+  luarocks lua5.1 liblua5.1-0-dev
+
+# 2) Neovim (0.10+)
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt update
+sudo apt install -y neovim
+
+# 3) Node.js 20.x + providers/tools
+sudo apt purge -y nodejs npm 2>/dev/null || true
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+sudo npm install -g neovim tree-sitter-cli
+pip3 install --user pynvim
+
+# 4) C++ language server
+sudo apt install -y clangd
+
+# 5) JetBrainsMono Nerd Font
+mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+tar -xf JetBrainsMono.tar.xz
+rm -f JetBrainsMono.tar.xz
+fc-cache -fv
+cd ~
+
+# 6) Clone config
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null || true
+git clone https://github.com/FurkannByrm/nvim-dots ~/.config/nvim
+
+# 7) Launch Neovim
+nvim
+```
+
+---
+
+## Step-by-Step Installation
+
+### 1) Update System
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-## Step 2 — Install Core Dependencies
+### 2) Install Core Dependencies
 
 ```bash
-sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
+sudo apt install -y \
+  git curl wget unzip build-essential cmake gdb \
+  python3-pip python3-venv \
+  ripgrep xclip wl-clipboard \
+  software-properties-common \
+  luarocks lua5.1 liblua5.1-0-dev
 ```
 
-| Package | Why It's Needed |
-|---------|----------------|
-| `git` | Plugin manager (Lazy.nvim) clones all plugins via git |
-| `curl`, `wget` | Download operations (Node.js, fonts, etc.) |
-| `unzip` | Required by Mason LSP manager to extract packages |
-| `build-essential` | `make`, `gcc`, `g++` — avante.nvim build step and C++ development |
-| `cmake` | Generate `compile_commands.json` for CMake projects |
-| `gdb` | C++ debugging via DAP (Debug Adapter Protocol) |
-| `python3-pip` | Python tooling |
-| `ripgrep` | Fast in-file search |
-| `xclip` | Neovim → system clipboard copy (`"+y`) |
-| `software-properties-common` | Required to add PPAs |
+| Package | Purpose |
+|---|---|
+| `git` | Clone and manage config/plugins |
+| `build-essential` | Build tools (`gcc/g++/make`) |
+| `cmake` | Generate `compile_commands.json` |
+| `gdb` | Debugger backend for DAP |
+| `ripgrep` | Fast project-wide search |
+| `luarocks`, `lua5.1` | Lua plugin dependencies |
+| `xclip`, `wl-clipboard` | Clipboard integration (X11/Wayland) |
 
-## Step 3 — Install Neovim (≥ 0.10)
-
-The default Ubuntu repositories ship a very old Neovim version. Install the latest from the PPA:
+### 3) Install Neovim (>= 0.10)
 
 ```bash
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
@@ -39,344 +121,200 @@ sudo apt update
 sudo apt install -y neovim
 ```
 
-Verify the installation:
-
+Verify:
 ```bash
 nvim --version
-# Should show v0.10+
 ```
 
-## Step 4 — Install Node.js (≥ 20)
-
-Copilot and some LSP servers require Node.js.
+### 4) Install Node.js (>= 20) + Neovim Providers
 
 ```bash
-# Remove old Node/npm if present
-sudo apt purge -y nodejs npm 2>/dev/null
-sudo rm -rf /usr/lib/node_modules /usr/local/lib/node_modules
+# Remove old Node.js versions if any
+sudo apt purge -y nodejs npm 2>/dev/null || true
 
-# Install Node.js 20.x LTS
+# Install Node.js 20.x
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
+
+# Install Node provider + tree-sitter CLI
+sudo npm install -g neovim tree-sitter-cli
+
+# Install Python provider
+pip3 install --user pynvim
 ```
 
-Verify the installation:
-
-```bash
-node -v   # v20.x+
-npm -v    # 10.x+
-```
-
-## Step 5 — Install Clangd (C++ LSP)
+### 5) Install Clangd
 
 ```bash
 sudo apt install -y clangd
 ```
 
-> **Note:** On Ubuntu 20.04 you may need to install a newer version explicitly:
-> ```bash
-> sudo apt install -y clangd-14
-> sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-14 100
-> ```
-
-## Step 6 — Install a Nerd Font (for icons)
-
-Plugins (nvim-web-devicons, Neo-tree) use a **Nerd Font** to render icons. Without one, icons will appear as broken characters.
+### 6) Install JetBrainsMono Nerd Font
 
 ```bash
 mkdir -p ~/.local/share/fonts
 cd ~/.local/share/fonts
-
-# Download JetBrainsMono Nerd Font
 curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
 tar -xf JetBrainsMono.tar.xz
 rm -f JetBrainsMono.tar.xz
-
-# Rebuild font cache
 fc-cache -fv
 ```
 
-Then change the font in your **terminal application settings** to **JetBrainsMono Nerd Font**.
+Set your terminal font to **JetBrainsMono Nerd Font**.
 
-## Step 7 — Clone the Configuration
+### 7) Clone the Configuration
 
 ```bash
-# Back up existing config if present
-mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
-
-# Clone this repository
-git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null || true
+git clone https://github.com/FurkannByrm/nvim-dots ~/.config/nvim
 ```
 
-## Step 8 — First Launch (Plugin Installation)
+---
+
+## First Launch
 
 ```bash
 nvim
 ```
 
-On the first launch **Lazy.nvim** will automatically download and install all plugins. This may take a few minutes.
-
-- Treesitter parsers are installed automatically (`cpp`, `c`, `lua`, `cmake`, `bash`, `markdown`).
-- Mason checks and installs the `clangd` LSP server.
-- **avante.nvim** runs its `make` build step.
-
-> Close and reopen Neovim after the installation finishes.
-
-## Step 9 — GitHub Copilot Authentication
-
-You need a GitHub Copilot subscription to use the AI features.
-
-```
-:Copilot auth
-```
-
-Sign in with your GitHub account in the browser window that opens and authorize.
-
-## Step 10 — Health Check
-
-Verify everything is installed correctly inside Neovim:
-
-```
-:checkhealth
-```
-
-Key checkpoints:
-
-- **clipboard** → `xclip` should be found
-- **Node.js** → `node` should be found
-- **Treesitter** → parsers should be installed
-- **LSP (clangd)** → should be running
+On first launch, wait for `lazy.nvim` to finish installing plugins.  
+Then restart Neovim once.
 
 ---
 
-## Quick Install (Single Copy-Paste Block)
+## Project Setup for C++ and ROS 2
 
-Run all the steps at once:
+For proper `clangd` indexing, generate a `compile_commands.json` in your project/workspace root.
 
-```bash
-# 1) Update system + install core packages
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y git curl wget unzip build-essential cmake gdb python3-pip ripgrep xclip software-properties-common
-
-# 2) Neovim (unstable PPA)
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
-sudo apt update && sudo apt install -y neovim
-
-# 3) Node.js 20.x
-sudo apt purge -y nodejs npm 2>/dev/null
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# 4) Clangd
-sudo apt install -y clangd
-
-# 5) Nerd Font
-mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
-tar -xf JetBrainsMono.tar.xz && rm -f JetBrainsMono.tar.xz
-fc-cache -fv
-
-# 6) Clone config
-mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
-git clone https://github.com/YOUR_USERNAME/REPO_NAME ~/.config/nvim
-
-# 7) Launch Neovim (plugins install automatically)
-nvim
-```
-
-> **Important:** After the first `nvim` launch, close and reopen Neovim, then run `:Copilot auth` to sign in.
-
----
-
-## LSP Configuration (Per-Project)
-
-### CMake Projects
+### Standard CMake Projects
 
 ```bash
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
-ln -s build/compile_commands.json .
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -B build
+ln -sf build/compile_commands.json .
 ```
 
-### ROS2 Projects
+### ROS 2 (colcon) Workspaces
 
 ```bash
 colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-ln -s build/YOUR_PACKAGE_NAME/compile_commands.json .
+ln -sf build/<PACKAGE_NAME>/compile_commands.json .
 ```
 
-##  Keybindings Reference
+---
+
+## Keybindings
+
+> Leader key: `Space`
 
 ### File Management (Neo-tree)
 
-| Key | Action |
-|-----|--------|
-| `<leader>e` (Space + e) | Toggle file explorer sidebar |
-| `a` | Add new file/folder (add `/` for directories) |
-| `d` | Delete file or directory |
-| `r` | Rename file or directory |
-| `x` | Cut (for moving files) |
-| `c` | Copy file |
-| `p` | Paste (complete move or copy) |
-| `y` | Copy file path to clipboard |
-| `H` | Toggle hidden files (.git, .clangd, etc.) |
-| `s` | Open selected file in horizontal split |
-| `v` | Open selected file in vertical split |
-| `t` | Open file in a new tab |
+| Keybinding | Action |
+|---|---|
+| `<leader>e` | Toggle file explorer |
+| `a` | Create file/folder |
+| `d` | Delete |
+| `r` | Rename |
+| `x / c / p` | Cut / Copy / Paste |
+| `H` | Toggle hidden files |
+| `s / v` | Open in horizontal / vertical split |
 
-### Window Management
+### Window Navigation
 
-| Key/Command | Action |
-|-------------|--------|
-| `:vsplit` or `:vsp` | Split window vertically |
-| `:split` or `:sp` | Split window horizontally |
-| `:vsp file.cpp` | Split vertically and open the specified file |
-| `:sp file.hpp` | Split horizontally and open the specified file |
-| `Ctrl + w + h/j/k/l` | Navigate between windows (left/down/up/right) |
-| `Ctrl + w + r` | Rotate window positions |
-| `Ctrl + w + H` | Move current window to the far left |
-| `Ctrl + w + J` | Move current window to the bottom |
-| `Ctrl + w + K` | Move current window to the top |
-| `Ctrl + w + L` | Move current window to the far right |
+| Keybinding | Action |
+|---|---|
+| `:vsplit` (`:vsp`) | Vertical split |
+| `:split` (`:sp`) | Horizontal split |
+| `Ctrl+w h/j/k/l` | Move between windows |
+| `Ctrl+w r` | Rotate layout |
+| `Ctrl+d / Ctrl+u` | Half-page down / up |
+| `zz` | Center current line |
+| `gg / G` | Top / bottom of file |
 
-#### Practical Scenario: Opening Files Side by Side
+### Header / Source Switching (a.vim)
 
-Let's say `Point.cpp` is open and you want `Point.hpp` next to it:
+| Keybinding / Command | Action |
+|---|---|
+| `ga` | Toggle `.cpp` ↔ `.hpp` |
+| `:AV` | Open alternate file (vertical split) |
+| `:AS` | Open alternate file (horizontal split) |
 
-1. Type `:vsp` (the screen splits with an empty pane).
-2. Press `Ctrl + w + l` to switch to the right pane.
-3. Type `:e Point.hpp` or find the file from Neo-tree.
+### LSP, Diagnostics, Editing
 
-### C++ Header/Source Switching (a.vim)
+| Keybinding | Action |
+|---|---|
+| `gd` | Go to definition |
+| `K` | Hover documentation |
+| `gl` | Line diagnostics popup |
+| `<leader>d` | Diagnostic popup |
+| `]d / [d` | Next / previous diagnostic |
+| `<leader>xx` | Toggle Trouble diagnostics |
+| `gcc` | Toggle line comment |
+| `gc` (visual) | Toggle comment for selection |
+| `ysw"` | Surround word with `"` |
+| `ds"` | Delete surrounding `"` |
 
-| Key/Command | Action |
-|-------------|--------|
-| `ga` | Toggle between header and source in current window (.cpp ↔ .hpp) |
-| `:AV` | Open the alternate file in a vertical split |
-| `:AS` | Open the alternate file in a horizontal split |
+### Debugging (nvim-dap)
 
-### Code Editing
+| Keybinding | Action |
+|---|---|
+| `<leader>b` | Toggle breakpoint |
+| `<F5>` | Start / continue |
+| `<F10>` | Step over |
+| `<F11>` | Step into |
 
-| Key | Action |
-|-----|--------|
-| `Alt + j` | Move line/selection down |
-| `Alt + k` | Move line/selection up |
-| `i` | Enter Insert mode at cursor |
-| `a` | Enter Insert mode after cursor |
-| `A` | Jump to end of line and enter Insert mode |
-| `o` | Open new line below and enter Insert mode |
-| `O` | Open new line above and enter Insert mode |
-| `u` | Undo |
-| `Ctrl + r` | Redo |
+---
 
-### Navigation & Scrolling
+## Health Check
 
-#### Page Scrolling
+Inside Neovim:
 
-| Key | Action |
-|-----|--------|
-| `Ctrl + d` | Scroll half page down |
-| `Ctrl + u` | Scroll half page up |
-| `Ctrl + f` | Scroll full page down (forward) |
-| `Ctrl + b` | Scroll full page up (back) |
-| `Ctrl + e` | Scroll screen down without moving cursor |
-| `Ctrl + y` | Scroll screen up without moving cursor |
+```vim
+:checkhealth
+```
 
-#### Cursor Positioning on Screen
+Confirm:
 
-| Key | Action |
-|-----|--------|
-| `zz` | Center current line on screen |
-| `zt` | Move current line to top of screen |
-| `zb` | Move current line to bottom of screen |
+- `vim.provider`: Python and Node providers are active
+- `nvim-treesitter`: `tree-sitter-cli` is detected
+- `luarocks`: installed and detected
+- `clipboard`: `xclip` (X11) or `wl-clipboard` (Wayland) is available
 
-> **Tip:** Press `zz` when you find a function to center it and see the surrounding code.
+---
 
-#### Jump to Screen Edges
+## Troubleshooting
 
-| Key | Action |
-|-----|--------|
-| `H` | Jump to the top (High) of the visible screen |
-| `M` | Jump to the middle of the visible screen |
-| `L` | Jump to the bottom (Low) of the visible screen |
+### Provider warnings (`vim.provider`)
 
-#### Jump to File Positions
+```bash
+pip3 install --user --upgrade pynvim
+sudo npm install -g neovim
+```
 
-| Key | Action |
-|-----|--------|
-| `gg` | Jump to the first line of the file |
-| `G` | Jump to the last line of the file |
-| `150G` | Jump directly to line 150 |
+### `tree-sitter-cli` not found
 
-### Commenting (Comment.nvim)
+```bash
+sudo npm install -g tree-sitter-cli
+```
 
-| Key | Action |
-|-----|--------|
-| `gcc` | Toggle line comment (`//`) on current line |
-| `gc` | Toggle comment on selected lines (Visual mode) |
-| `gbc` | Toggle block comment (`/* ... */`) on current line |
-| `3gcc` | Comment 3 lines starting from cursor |
+Alternative:
+```bash
+cargo install tree-sitter-cli
+```
 
-### Surround (nvim-surround)
+### Clipboard not working
 
-| Key | Action |
-|-----|--------|
-| `ysw"` | Surround word with quotes (`"`) |
-| `ds"` | Delete surrounding quotes |
+For X11:
+```bash
+sudo apt install -y xclip
+```
 
-### Multi-Cursor (vim-visual-multi)
+For Wayland:
+```bash
+sudo apt install -y wl-clipboard
+```
 
-| Key | Action |
-|-----|--------|
-| `Ctrl + n` | Multi-select same word in file, press `c` to edit all at once |
-| `q` | Skip a match while selecting (Skip) |
+---
 
-### LSP & Code Intelligence
+## Repository
 
-| Key | Action |
-|-----|--------|
-| `gl` | Show detailed error: opens diagnostic description in a floating window |
-| `<leader>d` (Space + d) | Show diagnostic message popup |
-| `]d` | Jump to next diagnostic |
-| `[d` | Jump to previous diagnostic |
-| `<leader>xx` (Space + xx) | Trouble: list all project-wide diagnostics |
-| `gd` | Go to Definition |
-| `K` | Show documentation (hover info) |
-
-### Debugging (DAP)
-
-| Key | Action |
-|-----|--------|
-| `<leader>b` (Space + b) | Toggle breakpoint |
-| `F5` | Start / Continue debugging |
-| `F10` | Step Over |
-| `F11` | Step Into |
-
-### Terminal
-
-| Key/Command | Action |
-|-------------|--------|
-| `Ctrl + \` | Toggle floating terminal |
-| `:!<command>` | Execute shell command (e.g., `:!make`) |
-
-### System Clipboard
-
-To copy text from Neovim and paste it into another terminal or browser, you need to use the system clipboard. Vim's internal register (`y`) does not communicate with the outside world by default.
-
-| Key | Action |
-|-----|--------|
-| `"+y` | Copy selected text to system clipboard |
-| `"+p` | Paste from system clipboard |
-
-**Usage:**
-
-1. Select the text you want to copy using Visual Mode (`v` or `V`).
-2. Press `"` then `+` then `y`.
-3. Switch to another terminal and paste with `Ctrl + Shift + v`.
-
-> **Note:** System clipboard support requires `xclip`: `sudo apt install xclip`
-
-## Notes
-
-- Leader key is set to `Space`
-- All keybindings are case-sensitive
-- Use `:checkhealth` to verify plugin installations
+- https://github.com/FurkannByrm/nvim-dots

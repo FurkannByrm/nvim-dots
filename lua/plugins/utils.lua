@@ -1,13 +1,50 @@
 return {
-  -- 1. TEMA: Tokyonight (C++ Kodlarını En İyi Gösteren Tema)
+  -- 1. TEMA: Tokyonight & Koyu Gri / Füme Alternatifler
   {
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      require("tokyonight").setup({ style = "storm", transparent = false })
-      vim.cmd([[colorscheme tokyonight-storm]])
+      require("tokyonight").setup({ 
+        style = "night", -- 'night' veya 'storm' mavi ton barındırır
+        transparent = false 
+      })
+      -- vim.cmd([[colorscheme tokyonight-night]])
     end,
+  },
+
+  -- Alternatif 1: Kanagawa (Dragon varyantı tam aradığınız mat koyu gridir)
+  {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("kanagawa").setup({ theme = "dragon" })
+      vim.cmd([[colorscheme kanagawa-dragon]]) -- ŞU AN AKTİF (Koyu Mat Gri)
+    end,
+  },
+
+  -- Alternatif 2: Nightfox / Carbonfox (Tamamen nötr karbon/füme tonları)
+  {
+    "EdenEast/nightfox.nvim",
+    lazy = false,
+    priority = 1000,
+    -- config = function()
+    --   vim.cmd([[colorscheme carbonfox]]) -- Kullanmak için yorumu kaldırın
+    -- end,
+  },
+
+  -- Alternatif 3: Gruvbox Material (Klasik koyu füme/gri arka plan)
+  {
+    "sainnhe/gruvbox-material",
+    lazy = false,
+    priority = 1000,
+    init = function()
+      vim.g.gruvbox_material_background = "hard" -- 'hard' veya 'medium'
+    end,
+    -- config = function()
+    --   vim.cmd([[colorscheme gruvbox-material]]) -- Kullanmak için yorumu kaldırın
+    -- end,
   },
 
   -- 2. TREESITTER: Akıllı Renklendirme ve Analiz
@@ -19,7 +56,6 @@ return {
       local ok, configs = pcall(require, "nvim-treesitter.configs")
       if not ok then return end
       configs.setup({
-        -- Markdown parser hatalarını çözmek için [image_f33456.png]
         ensure_installed = { "cpp", "c", "lua", "cmake", "bash", "markdown", "markdown_inline" },
         highlight = { enable = true, additional_vim_regex_highlighting = false },
         indent = { enable = true },
@@ -28,12 +64,10 @@ return {
   },
 
   -- 3. HEADER/SOURCE GEÇİŞİ: a.vim
-  -- Kısayol: 'ga' (Go Alternate) tuşuna basarak .cpp/.hpp arası geçiş yap
   { 
     "vim-scripts/a.vim", 
     event = "VeryLazy",
     init = function()
-      -- src/ ve include/ ayrı klasörlerde olan projeleri destekle
       vim.g.alternateSearchPath = table.concat({
         "sfr:../include",        -- src/ -> include/
         "sfr:../src",            -- include/ -> src/
@@ -43,7 +77,6 @@ return {
         "reg:|include[/\\\\]|src/|",   -- include/x.hpp -> src/x.cpp
         "sfr:.",                 -- aynı klasör (fallback)
       }, ",")
-      -- .hpp <-> .cpp eşleşmesini ekle
       vim.g.alternateExtensions_hpp = "cpp,cc,cxx"
       vim.g.alternateExtensions_cpp = "hpp,h,hxx"
       vim.g.alternateExtensions_h = "cpp,cc,c,cxx"
@@ -82,8 +115,7 @@ return {
     end
   },
 
-  
-    --7.
+  -- 7. MULTI CURSOR
   { 'mg979/vim-visual-multi', branch = 'master' },
 
   -- 8. DİĞER TEMEL ARAÇLAR
@@ -91,16 +123,3 @@ return {
   { "akinsho/toggleterm.nvim", version = "*", config = function() require("toggleterm").setup({ direction = 'float' }) end },
   { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup({}) end }
 }
-
-
--- a: new file (when you write a name and then if put / it creates a directory).
-
--- d: deletes file
-
--- r: (Rename).
-
--- c: (Copy).
-
--- m:  (Move).
-
--- y: copy path.
