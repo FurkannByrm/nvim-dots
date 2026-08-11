@@ -1,11 +1,4 @@
-# Neovim Configuration for C++ & ROS 2 Development
-
-A modern, fast, and practical Neovim setup focused on:
-
-- **C++20/23**
-- **ROS 2**
-- **Python**
-- **Lua**
+# Neovim Configuration
 
 Built around `lazy.nvim`, `nvim-cmp`, `mason.nvim`, `nvim-treesitter`, and `nvim-dap`.
 

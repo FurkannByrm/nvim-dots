@@ -1,50 +1,14 @@
 return {
-  -- 1. TEMA: Tokyonight & Koyu Gri / Füme Alternatifler
+  -- 1. TEMA: OneDark (joshdick/onedark.vim)
   {
-    "folke/tokyonight.nvim",
+    "joshdick/onedark.vim",
     lazy = false,
     priority = 1000,
     config = function()
-      require("tokyonight").setup({ 
-        style = "night", -- 'night' veya 'storm' mavi ton barındırır
-        transparent = false 
-      })
-      -- vim.cmd([[colorscheme tokyonight-night]])
+      -- Termguicolors desteğini aç (doğru renk tonları için şarttır)
+      vim.opt.termguicolors = true
+      vim.cmd([[colorscheme onedark]])
     end,
-  },
-
-  -- Alternatif 1: Kanagawa (Dragon varyantı tam aradığınız mat koyu gridir)
-  {
-    "rebelot/kanagawa.nvim",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      require("kanagawa").setup({ theme = "dragon" })
-      vim.cmd([[colorscheme kanagawa-dragon]]) -- ŞU AN AKTİF (Koyu Mat Gri)
-    end,
-  },
-
-  -- Alternatif 2: Nightfox / Carbonfox (Tamamen nötr karbon/füme tonları)
-  {
-    "EdenEast/nightfox.nvim",
-    lazy = false,
-    priority = 1000,
-    -- config = function()
-    --   vim.cmd([[colorscheme carbonfox]]) -- Kullanmak için yorumu kaldırın
-    -- end,
-  },
-
-  -- Alternatif 3: Gruvbox Material (Klasik koyu füme/gri arka plan)
-  {
-    "sainnhe/gruvbox-material",
-    lazy = false,
-    priority = 1000,
-    init = function()
-      vim.g.gruvbox_material_background = "hard" -- 'hard' veya 'medium'
-    end,
-    -- config = function()
-    --   vim.cmd([[colorscheme gruvbox-material]]) -- Kullanmak için yorumu kaldırın
-    -- end,
   },
 
   -- 2. TREESITTER: Akıllı Renklendirme ve Analiz
