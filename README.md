@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-Built around `lazy.nvim`, `nvim-cmp`, `mason.nvim`, `nvim-treesitter`, and `nvim-dap`.
+Modern C++, ROS 2, and Lua development environment built around `lazy.nvim`, `nvim-cmp`, `mason.nvim`, `nvim-treesitter`, and `nvim-dap`.
 
 ---
 
@@ -20,26 +20,27 @@ Built around `lazy.nvim`, `nvim-cmp`, `mason.nvim`, `nvim-treesitter`, and `nvim
 
 ## Features
 
-- Fast plugin management with `lazy.nvim`
-- LSP support and completion via `nvim-cmp`
-- Syntax highlighting and parsing via `nvim-treesitter`
-- Tool/LSP installer via `mason.nvim`
-- Debug workflow with `nvim-dap`
-- File navigation with Neo-tree
-- C++/ROS 2 workflow with `clangd`
+- Fast and deterministic plugin management with `lazy.nvim`
+- Native Neovim 0.10+ snippet expansion & auto-completion via `nvim-cmp`
+- Fast syntax highlighting and AST parsing via `nvim-treesitter`
+- Language server and linter installer via `mason.nvim`
+- Full C/C++ GDB debugger integration via `nvim-dap` & `nvim-dap-ui`
+- Workspace diagnostics & error tracing via `trouble.nvim`
+- Native buffer/source toggling for C++ (`a.vim`)
+- Fast structural surrounding via `nvim-surround`
+- File navigation with `neo-tree.nvim`
 
 ---
 
 ## Quick Install (Single Copy-Paste Block)
 
-> Recommended for Ubuntu 20.04 / 22.04 / 24.04.
+> Recommended for Ubuntu 20.04 / 22.04 / 24.04 LTS.
 
 ```bash
 # 1) System update + core packages
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
   git curl wget unzip build-essential cmake gdb \
-  python3-pip python3-venv \
   ripgrep xclip wl-clipboard \
   software-properties-common \
   luarocks lua5.1 liblua5.1-0-dev
@@ -49,31 +50,31 @@ sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
 sudo apt install -y neovim
 
-# 3) Node.js 20.x + providers/tools
+# 3) Node.js 20.x + Tree-sitter CLI
 sudo apt purge -y nodejs npm 2>/dev/null || true
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL [https://deb.nodesource.com/setup_20.x](https://deb.nodesource.com/setup_20.x) | sudo -E bash -
 sudo apt install -y nodejs
-sudo npm install -g neovim tree-sitter-cli
-pip3 install --user pynvim
+sudo npm install -g tree-sitter-cli
 
 # 4) C++ language server
 sudo apt install -y clangd
 
 # 5) JetBrainsMono Nerd Font
-mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts
+curl -fLO [https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz)
 tar -xf JetBrainsMono.tar.xz
 rm -f JetBrainsMono.tar.xz
 fc-cache -fv
 cd ~
 
-# 6) Clone config
+# 6) Git handshake stability & clone config
+git config --global protocol.version 1
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null || true
-git clone https://github.com/FurkannByrm/nvim-dots ~/.config/nvim
+git clone [https://github.com/FurkannByrm/nvim-dots](https://github.com/FurkannByrm/nvim-dots) ~/.config/nvim
 
 # 7) Launch Neovim
 nvim
-```
 
 ---
 
@@ -284,6 +285,13 @@ sudo npm install -g neovim
 ```
 
 ### `tree-sitter-cli` not found
+
+
+###Troubleshooting
+
+```Bash
+git config --global protocol.version 1
+```
 
 ```bash
 sudo npm install -g tree-sitter-cli

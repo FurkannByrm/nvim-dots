@@ -1,17 +1,17 @@
 return {
-  -- 1. TEMA: OneDark (joshdick/onedark.vim)
+  -- 1. TEMA: OneDark (Lua Sürümü)
   {
-    "joshdick/onedark.vim",
+    "navarasu/onedark.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      -- Termguicolors desteğini aç (doğru renk tonları için şarttır)
       vim.opt.termguicolors = true
-      vim.cmd([[colorscheme onedark]])
+      require("onedark").setup({ style = "dark" })
+      require("onedark").load()
     end,
   },
 
-  -- 2. TREESITTER: Akıllı Renklendirme ve Analiz
+  -- 2. TREESITTER: Akıllı Renklendirme
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -28,18 +28,18 @@ return {
   },
 
   -- 3. HEADER/SOURCE GEÇİŞİ: a.vim
-  { 
-    "vim-scripts/a.vim", 
+  {
+    "vim-scripts/a.vim",
     event = "VeryLazy",
     init = function()
       vim.g.alternateSearchPath = table.concat({
-        "sfr:../include",        -- src/ -> include/
-        "sfr:../src",            -- include/ -> src/
-        "sfr:../include/**",     -- src/ -> include/alt_klasörler/
-        "sfr:../src/**",         -- include/alt/ -> src/alt/
-        "reg:|src[/\\\\]|include/|",   -- src/x.cpp -> include/x.hpp
-        "reg:|include[/\\\\]|src/|",   -- include/x.hpp -> src/x.cpp
-        "sfr:.",                 -- aynı klasör (fallback)
+        "sfr:../include",
+        "sfr:../src",
+        "sfr:../include/**",
+        "sfr:../src/**",
+        "reg:|src[/\\\\]|include/|",
+        "reg:|include[/\\\\]|src/|",
+        "sfr:.",
       }, ",")
       vim.g.alternateExtensions_hpp = "cpp,cc,cxx"
       vim.g.alternateExtensions_cpp = "hpp,h,hxx"
@@ -47,43 +47,26 @@ return {
       vim.g.alternateExtensions_cc = "hpp,h,hxx"
     end,
     config = function()
-      vim.keymap.set('n', 'ga', ':A<CR>', { desc = "Header/Source Toggle" })
-    end
+      vim.keymap.set("n", "ga", ":A<CR>", { desc = "Header/Source Toggle" })
+    end,
   },
 
-  -- 4. SURROUND: Metni "" veya {} Arasına Alma
-  {
-    "kylechui/nvim-surround",
-    version = "*",
-    event = "VeryLazy",
-    config = function() require("nvim-surround").setup({}) end
-  },
 
-  -- 5. TROUBLE: Hataları ve Uyarıları Listeleme
-  {
-    "folke/trouble.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("trouble").setup({})
-      vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>")
-    end
-  },
-
-  -- 6. NEO-TREE: Dosya Gezgini
+  -- 4. NEO-TREE: Dosya Gezgini
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
     dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons", "MunifTanjim/nui.nvim" },
     config = function()
-      vim.keymap.set('n', '<leader>e', ':Neotree toggle<CR>')
-    end
+      vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>")
+    end,
   },
 
-  -- 7. MULTI CURSOR
-  { 'mg979/vim-visual-multi', branch = 'master' },
+  -- 5. MULTI CURSOR
+  { "mg979/vim-visual-multi", branch = "master" },
 
-  -- 8. DİĞER TEMEL ARAÇLAR
-  { "numToStr/Comment.nvim", config = function() require('Comment').setup() end },
-  { "akinsho/toggleterm.nvim", version = "*", config = function() require("toggleterm").setup({ direction = 'float' }) end },
-  { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup({}) end }
+  -- 6. DİĞER TEMEL ARAÇLAR
+  { "numToStr/Comment.nvim", config = function() require("Comment").setup() end },
+  { "akinsho/toggleterm.nvim", version = "*", config = function() require("toggleterm").setup({ direction = "float" }) end },
+  { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup({}) end },
 }
